@@ -1,0 +1,13 @@
+{
+  "id": "qwen3-32b",
+  "name": "Qwen3 32B",
+  "kind": "chat",
+  "protocol": "openai-chat",
+  "host": { "type": "vast", "label": "qwen3-32b", "port": 8080, "tunnel": true, "sshKey": "~/.ssh/id_ed25519" },
+  "params": [
+    { "key": "temperature", "label": "Temperature", "type": "number", "min": 0, "max": 2, "step": 0.05, "default": 0.6 },
+    { "key": "top_p", "label": "Top P", "type": "number", "min": 0, "max": 1, "step": 0.05, "default": 0.95 },
+    { "key": "max_tokens", "label": "Max tokens", "type": "number", "min": 1, "step": 1, "default": null, "placeholder": "server default" }
+  ],
+  "notes": "Add /no_think to a message to skip reasoning."
+}

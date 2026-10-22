@@ -1,0 +1,16 @@
+{
+  "id": "flux-dev",
+  "name": "FLUX.1 dev",
+  "kind": "image",
+  "protocol": "comfyui",
+  "host": { "type": "vast", "label": "flux-dev", "port": 8188, "tunnel": true, "sshKey": "~/.ssh/id_ed25519" },
+  "inputs": [{ "key": "refs", "label": "Reference image", "accept": "image", "max": 1, "required": true }],
+  "params": [
+    { "key": "aspect", "label": "Aspect", "type": "select", "options": ["1:1", "3:4", "4:3", "9:16", "16:9"], "default": "1:1" },
+    { "key": "shortEdge", "label": "Short edge", "type": "select", "options": [768, 1024, 1280], "default": 1024, "suffix": "px" },
+    { "key": "steps", "label": "Steps", "type": "number", "min": 4, "max": 50, "step": 1, "default": 28 },
+    { "key": "seed", "label": "Seed", "type": "number", "min": 0, "step": 1, "default": null, "placeholder": "random" }
+  ],
+  "options": { "workflow": "flux-dev.json" },
+  "notes": "Natural-language prompts work best; describe subject, setting, light and style."
+}
