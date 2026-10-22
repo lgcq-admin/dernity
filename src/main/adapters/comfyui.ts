@@ -12,7 +12,8 @@ import path from "node:path";
 import { z } from "zod";
 import type { ModelConfig } from "@shared/model";
 import type { Conn } from "../hosts";
-import { inside, WORKFLOWS } from "../paths";
+import { WORKFLOWS } from "../paths";
+import { readConfinedFile } from "../safe-file";
 import { type GenerationAdapter, expectOk, type OutputFile } from "./types";
 import { deriveValues, fillWorkflow, type Values } from "./workflow";
 
@@ -36,10 +37,13 @@ function options(model: ModelConfig) {
 }
 
 function loadWorkflow(rel: string): unknown {
-  const file = inside(WORKFLOWS, rel);
-  if (!file) throw new Error(`Workflow path escapes workspace/workflows: ${rel}`);
-  if (!fs.existsSync(file)) throw new Error(`Workflow not found: workflows/${rel}`);
-  return JSON.parse(fs.readFileSync(file, "utf8"));
+  const text = readConfinedFile(WORKFLOWS, rel, 5 * 1024 * 1024, `Workflow workflows/${rel}`).toString("utf8");
+  try {
+    return JSON.parse(text);
+  } catch {
+    // No parser message: it can quote the file, and this error is shown and logged.
+    throw new Error(`Workflow workflows/${rel} is not valid JSON`);
+  }
 }
 
 async function history(conn: Conn, id: string): Promise<HistoryEntry | undefined> {

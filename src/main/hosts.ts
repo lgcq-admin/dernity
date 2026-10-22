@@ -6,7 +6,7 @@ import os from "node:os";
 import type { Host, ModelConfig } from "@shared/model";
 import { refreshShellEnv } from "./env";
 import { SECRETS } from "./paths";
-import { readTokenFile } from "./token-file";
+import { readTokenFile } from "./safe-file";
 import { pickByName } from "./providers/pick";
 import { fetchRunpod, fetchRunpodSsh, runpodProxyUrl } from "./providers/runpod";
 import { fetchVastInstances, type VastInstance, vastPublicPort, vastSsh } from "./providers/vast";

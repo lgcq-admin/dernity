@@ -2,7 +2,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { readTokenFile } from "./token-file";
+import { readConfinedFile, readTokenFile } from "./safe-file";
 
 let root: string;
 let secrets: string;
@@ -41,5 +41,24 @@ describe("readTokenFile", () => {
 
   it("refuses names with path parts", () => {
     expect(() => readTokenFile(secrets, "../x")).toThrow("Invalid token file name");
+  });
+});
+
+describe("readConfinedFile", () => {
+  it("reads files in subfolders", () => {
+    fs.mkdirSync(path.join(secrets, "sub"));
+    fs.writeFileSync(path.join(secrets, "sub", "wf.json"), "{}");
+    expect(readConfinedFile(secrets, "sub/wf.json", 100).toString()).toBe("{}");
+  });
+
+  it("refuses a symlinked folder pointing elsewhere", () => {
+    fs.mkdirSync(path.join(root, "elsewhere"));
+    fs.writeFileSync(path.join(root, "elsewhere", "creds.json"), "{}");
+    fs.symlinkSync(path.join(root, "elsewhere"), path.join(secrets, "linked"));
+    expect(() => readConfinedFile(secrets, "linked/creds.json", 100)).toThrow("outside its folder");
+  });
+
+  it("refuses paths that climb out", () => {
+    expect(() => readConfinedFile(secrets, "../x.json", 100)).toThrow("outside its folder");
   });
 });
