@@ -5,10 +5,10 @@
   "description": "Desktop workspace for models you host on rented GPUs",
   "author": "Anton Shpyhunov <dableboble@gmail.com>",
   "license": "MIT",
-  "homepage": "https://github.com/lgcq-admin/dernity",
+  "homepage": "https://github.com/lgcq-group-org/dernity",
   "repository": {
     "type": "git",
-    "url": "https://github.com/lgcq-admin/dernity.git"
+    "url": "https://github.com/lgcq-group-org/dernity.git"
   },
   "desktopName": "dernity.desktop",
   "private": true,

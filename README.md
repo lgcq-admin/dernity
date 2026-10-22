@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/lgcq-admin/dernity/releases/latest"><b>Download</b></a> ·
+  <a href="https://github.com/lgcq-group-org/dernity/releases/latest"><b>Download</b></a> ·
   <a href="#getting-started">Getting started</a> ·
   <a href="#how-it-works">How it works</a> ·
   <a href="#your-data">Your data</a>
@@ -45,7 +45,7 @@ Dernity puts that in one place:
 
 ### 1. Install
 
-Grab the file for your system from the [latest release](https://github.com/lgcq-admin/dernity/releases/latest):
+Grab the file for your system from the [latest release](https://github.com/lgcq-group-org/dernity/releases/latest):
 
 | System | File |
 | --- | --- |
@@ -164,7 +164,7 @@ Set `DERNITY_HOME` to keep this folder somewhere else.
 You need Node.js 22 or newer.
 
 ```bash
-git clone https://github.com/lgcq-admin/dernity.git
+git clone https://github.com/lgcq-group-org/dernity.git
 cd dernity
 npm install
 npm run dev     # start the app with hot reload
