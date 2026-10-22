@@ -1,0 +1,29 @@
+appId: dev.dernity.app
+productName: Dernity
+directories:
+  buildResources: resources
+files:
+  - out/**
+  - resources/icon.png
+  - package.json
+asarUnpack:
+  - node_modules/node-pty/**
+extraResources:
+  - from: workspace
+    to: workspace
+artifactName: ${productName}-${version}-${os}-${arch}.${ext}
+linux:
+  target: [AppImage, deb]
+  category: Development
+  syncDesktopName: true
+  icon: resources/icon.png
+mac:
+  target: dmg
+  icon: resources/icon.png
+  category: public.app-category.developer-tools
+win:
+  target: nsis
+  icon: resources/icon.png
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
