@@ -27,7 +27,8 @@ src/
   preload/    typed IPC bridge (contextBridge). Thin: no logic.
   renderer/   React UI. No Node, no fs, no secrets, no direct calls to models or providers.
   shared/     types and zod schemas shared by main and renderer (model config, IPC contracts).
-workspace/    template copied to ~/Dernity/workspace: CLAUDE.md, AGENTS.md, skills, scripts for users' agents.
+workspace/    template copied to ~/Dernity/workspace on every start: CLAUDE.md, AGENTS.md, skills, scripts and
+              example configs for users' agents. NOTES.md is copied once and then belongs to the user.
 ```
 
 - `contextIsolation: true`, `nodeIntegration: false`, sandboxed renderer. Every IPC channel has a zod
@@ -46,7 +47,7 @@ workspace/    template copied to ~/Dernity/workspace: CLAUDE.md, AGENTS.md, skil
 ~/Dernity/
   workspace/            agent cwd: instructions, skills, models/*.json
   library/<date>/<id>/  meta.json (prompt, params, model, seed, time) + refs/ + outputs
-  chats/<id>.jsonl
+  chats/<id>.json, chats/files/
 ```
 
 - Plain files only. No database, no cloud, no telemetry, no analytics.
@@ -55,6 +56,20 @@ workspace/    template copied to ~/Dernity/workspace: CLAUDE.md, AGENTS.md, skil
 - Configs and metadata are human-readable JSON. A user must be able to back up by copying the folder.
 - Secrets (provider API keys) go through Electron `safeStorage`. Never log them, never write them to
   config files, never send them to the renderer.
+
+## Security
+
+Configs in `workspace/` are written by an agent that reads web pages, so treat them like any other
+untrusted input. Lessons from reviews so far:
+
+- Anything from a config, the renderer or a provider API that reaches `spawn` arguments must be validated
+  so it can't be read as an option (no leading `-`); pass `--` before positional arguments.
+- Never let a config choose which local secret is sent where. Server tokens come only from
+  `workspace/secrets/` (`apiKeyFile`, plain file names) or `DERNITY_*` environment variables.
+- Paths from configs or IPC are resolved with `inside()` and rejected if they escape their folder.
+- Agent instructions in `workspace/` must never lead to a model server open to the internet without
+  authentication: tunnel it or require a token.
+- Template files that agents read must not contain examples that look like real user preferences.
 
 ## Money
 
@@ -87,6 +102,7 @@ action in the UI. Stopping can be offered, never done silently.
 ## Workflow
 
 - `npm run dev` to run, `npm test` for unit tests, `npm run typecheck` and `npm run lint` before
-  committing.
+  committing, `npm run dist` to package.
+- Run with `DERNITY_HOME=/some/scratch/dir` to try things without touching your real `~/Dernity`.
 - Conventional commits (`feat:`, `fix:`, `refactor:`, `docs:`, `chore:`).
 - Verify UI changes by running the app, not by writing tests for them.

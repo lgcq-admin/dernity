@@ -36,6 +36,33 @@ The owner of a rented machine can technically see what runs on it, including you
 Dernity can't change that. For sensitive work, prefer datacenter hosts (RunPod Secure Cloud, verified
 datacenters on Vast.ai) and delete instances when you're done.
 
+## Getting started
+
+Requirements: Node.js 22+, and at least one agent CLI (Claude Code, Codex, Gemini CLI, OpenCode, …) installed
+and logged in. For deploying, the provider CLIs help: `vastai` and `runpodctl`.
+
+```bash
+npm install
+npm run dev        # run in development
+npm run dist       # build an installer into dist/ (AppImage, dmg or exe for the current OS)
+```
+
+Everything Dernity stores lives in `~/Dernity` (override with `DERNITY_HOME`):
+
+```
+~/Dernity/
+  workspace/   where your agent works: instructions, skills, model configs, ComfyUI workflows
+  library/     generations: one folder each with meta.json, references and outputs
+  chats/       chat history
+```
+
+Provider API keys are picked up from the `vastai` / `runpodctl` configs or the `VAST_API_KEY` /
+`RUNPOD_API_KEY` environment variables. You can also save them in Settings, encrypted with the OS keychain.
+
 ## Development
 
 See [AGENTS.md](AGENTS.md) for architecture and code rules.
+
+---
+
+Built by [lgcq.group](https://lgcq.group).
