@@ -10,6 +10,7 @@
 </p>
 
 <p align="center">
+  <a href="https://dernity.org"><b>Website</b></a> ·
   <a href="https://github.com/lgcq-group-org/dernity/releases/latest"><b>Download</b></a> ·
   <a href="#getting-started">Getting started</a> ·
   <a href="#how-it-works">How it works</a> ·
@@ -179,4 +180,4 @@ Architecture, code style and the security rules for contributors are in [AGENTS.
 
 ---
 
-<p align="center">Built by <a href="https://lgcq.group">lgcq.group</a></p>
+<p align="center"><a href="https://dernity.org">dernity.org</a> · Built by <a href="https://lgcq.group">lgcq.group</a></p>
