@@ -1,67 +1,177 @@
-# Dernity
+<p align="center">
+  <img src="resources/icon.svg" width="88" alt="Dernity logo">
+</p>
 
-A desktop workspace for models you host yourself on rented GPUs (Vast.ai, RunPod, any SSH box).
+<h1 align="center">Dernity</h1>
 
-- **Deploy** a model by asking your own coding agent (Claude Code, Codex, …) in the built-in terminal.
-  Dernity ships the instructions and skills; the agent finds the model, compares GPU offers, and deploys
-  after you pick one.
-- **Use** it in one window: chat for text models, generation with previews for image and video models.
-- **Adaptive UI**: the agent figures out what a model supports (reference images, first/last frame,
-  duration, …) and writes a model config. The UI shows only the inputs that model accepts.
-- **Machines at a glance**: balances, running and stopped instances, and $/h across providers.
+<p align="center">
+  Your own AI lab on rented GPUs.<br>
+  Deploy open models on Vast.ai or RunPod by asking your coding agent, then use them from one desktop window.
+</p>
 
-## Principles
+<p align="center">
+  <a href="https://github.com/lgcq-admin/dernity/releases/latest"><b>Download</b></a> ·
+  <a href="#getting-started">Getting started</a> ·
+  <a href="#how-it-works">How it works</a> ·
+  <a href="#your-data">Your data</a>
+</p>
 
-- **Local only.** Prompts, parameters and outputs stay on your machine as plain files. No cloud, no
-  server database, no telemetry.
-- **Your agent, your login.** Dernity runs the CLIs you already have installed and logged in. No API
-  key for the agent.
-- **Private from the agent.** Your library (prompts, outputs, references) sits outside the agent's
-  workspace and is denied to it.
+<p align="center">
+  <img src="docs/chat.png" alt="Chatting with a model running on a rented GPU" width="880">
+</p>
+
+## Why
+
+Running your own models on rented GPUs is cheap, but the workflow around it is messy: picking a machine on
+one site, starting a server over SSH, copying URLs into some chat UI, a separate tool for images, and
+remembering to stop the machine afterwards.
+
+Dernity puts that in one place:
+
+- **Deploy by asking.** Open the built-in terminal, start Claude Code, Codex or any agent CLI you already use,
+  and say "deploy Qwen3 32B". It looks the model up, compares GPU offers on Vast.ai and RunPod, waits for you
+  to pick one, starts the server and connects it to the app.
+- **One window for every model.** Text models get a chat. Image and video models get a generation studio.
+- **The UI fits the model.** If a video model takes a first and last frame, you get two frame slots. If an
+  image model takes references, you can attach them. If it doesn't, the field isn't there.
+- **Know what you're paying for.** Balances, running and stopped machines, $/h, and a history of what ran
+  where, with a button to bring it back.
+
+<p align="center">
+  <img src="docs/studio.png" alt="A video model that takes a first and last frame" width="880">
+</p>
+
+## Getting started
+
+### 1. Install
+
+Grab the file for your system from the [latest release](https://github.com/lgcq-admin/dernity/releases/latest):
+
+| System | File |
+| --- | --- |
+| Linux | `.AppImage` (any distro) or `.deb` (Debian, Ubuntu) |
+| macOS | `-mac-arm64.dmg` for Apple Silicon, `-mac-x64.dmg` for Intel |
+| Windows | `.exe` installer |
+
+The builds aren't signed yet, so the first launch needs one extra click:
+
+- **macOS:** right-click Dernity in Applications and choose **Open**.
+- **Windows:** on the SmartScreen warning, click **More info**, then **Run anyway**.
+- **Linux AppImage:** make it executable first: `chmod +x Dernity-*.AppImage`.
+
+### 2. Have an agent ready
+
+Dernity doesn't ship its own AI. It runs the agent CLIs you already have, logged in as you, so there are no
+extra API keys to set up. Any of these works and is detected automatically:
+
+Claude Code · Codex · Gemini CLI · OpenCode · Cursor Agent · Qwen Code · Aider · Goose · Amp · Crush
+
+### 3. Connect a GPU provider
+
+You need an account with money on it at [Vast.ai](https://vast.ai) or [RunPod](https://runpod.io).
+
+- **API key.** If you use the `vastai` or `runpodctl` CLI, Dernity reads the key from their config.
+  Otherwise paste it in **Settings**; it's stored encrypted with your system keychain.
+- **SSH key.** Add your public SSH key to your Vast.ai or RunPod account. The agent sets model servers up
+  behind an SSH tunnel or a token, so nobody else can use them.
+
+### 4. Deploy your first model
+
+Open the terminal (<kbd>Ctrl</kbd>+<kbd>`</kbd>), start your agent and ask for what you want:
+
+> Deploy Qwen3 8B for chat on something cheap
+
+The agent shows you a few machines with prices and waits for your choice. When the server is up, the model
+appears in the sidebar with a green dot. Click it and start chatting.
+
+More things to try:
+
+> Deploy Wan 2.2 image-to-video with first and last frame
+>
+> Connect my running Vast instance flux-dev, ComfyUI is on port 8188
+>
+> Run again the Qwen I had yesterday
+
+When you're done, ask the agent to stop or delete the machine, or do it from your provider's dashboard.
+Stopped machines on Vast.ai still cost a little for their disk.
 
 ## How it works
 
 ```
-Dernity (Electron)
-├─ terminals       your installed CLIs (claude, codex, …), auto-detected, run in ~/Dernity/workspace
-├─ models          JSON configs the agent writes; the app watches them and updates the UI
-├─ chat / studio   talks to models over OpenAI-compatible APIs, ComfyUI, …
-├─ machines        Vast.ai and RunPod APIs: balances, instances, cost
-└─ library         ~/Dernity/library: every generation with its prompt, params and outputs
+ you ──▶ agent in the built-in terminal ──▶ rents a GPU, starts the model server
+                     │
+                     ▼
+        ~/Dernity/workspace/models/qwen3-8b.json   ◀── the agent writes a config
+                     │
+                     ▼
+ Dernity reads it ──▶ sidebar entry, chat or studio form, health checks ──▶ SSH tunnel ──▶ GPU
 ```
 
-## Privacy note about rented GPUs
+Each model is a small JSON file: where it runs, which API it speaks, and what it accepts. The app watches
+the folder and updates as soon as a file changes. You can edit these files by hand too.
 
-The owner of a rented machine can technically see what runs on it, including your prompts and outputs.
-Dernity can't change that. For sensitive work, prefer datacenter hosts (RunPod Secure Cloud, verified
-datacenters on Vast.ai) and delete instances when you're done.
-
-## Getting started
-
-Requirements: Node.js 22+, and at least one agent CLI (Claude Code, Codex, Gemini CLI, OpenCode, …) installed
-and logged in. For deploying, the provider CLIs help: `vastai` and `runpodctl`.
-
-```bash
-npm install
-npm run dev        # run in development
-npm run dist       # build an installer into dist/ (AppImage, dmg or exe for the current OS)
+```json
+{
+  "id": "wan22-flf2v",
+  "name": "Wan 2.2 first/last frame",
+  "kind": "video",
+  "protocol": "comfyui",
+  "host": { "type": "runpod", "podName": "wan22", "port": 8188, "tunnel": true },
+  "inputs": [
+    { "key": "first_frame", "label": "First frame", "accept": "image", "required": true },
+    { "key": "last_frame", "label": "Last frame", "accept": "image", "required": true }
+  ],
+  "params": [{ "key": "seconds", "label": "Duration", "type": "number", "min": 1, "max": 5, "default": 5 }],
+  "options": { "workflow": "wan22-flf2v.json" }
+}
 ```
 
-Everything Dernity stores lives in `~/Dernity` (override with `DERNITY_HOME`):
+What it can talk to:
+
+| | Supported |
+| --- | --- |
+| Model servers | Anything OpenAI-compatible (llama.cpp, vLLM, SGLang, Ollama, TGI, LM Studio) and ComfyUI |
+| Where they run | Vast.ai, RunPod, any machine you can SSH into, or a plain URL |
+
+The agent's instructions and skills live in [`workspace/`](workspace) and are copied into
+`~/Dernity/workspace` on every start. They cover deploying, connecting, describing a model's capabilities,
+and redeploying from history, plus the rules agents must follow (ask before spending money, never expose a
+server without authentication, never print secrets).
+
+## Your data
+
+Everything stays on your computer, in plain files you can open, back up or delete:
 
 ```
 ~/Dernity/
   workspace/   where your agent works: instructions, skills, model configs, ComfyUI workflows
-  library/     generations: one folder each with meta.json, references and outputs
+  library/     every generation in its own folder: prompt, parameters, references and outputs
   chats/       chat history
 ```
 
-Provider API keys are picked up from the `vastai` / `runpodctl` configs or the `VAST_API_KEY` /
-`RUNPOD_API_KEY` environment variables. You can also save them in Settings, encrypted with the OS keychain.
+There's no account, no cloud and no telemetry. Your library and chats are kept away from the agent: they live
+outside its workspace, agents are told never to touch them, and Claude Code is configured to deny reading them.
 
-## Development
+Set `DERNITY_HOME` to keep this folder somewhere else.
 
-See [AGENTS.md](AGENTS.md) for architecture and code rules.
+> [!NOTE]
+> Whoever owns a rented GPU can, in principle, see what runs on it, including prompts and outputs.
+> No app can change that. For anything sensitive, use datacenter hosts (RunPod Secure Cloud, verified
+> datacenters on Vast.ai) and delete machines when you're done.
+
+## Build from source
+
+You need Node.js 22 or newer.
+
+```bash
+git clone https://github.com/lgcq-admin/dernity.git
+cd dernity
+npm install
+npm run dev     # start the app with hot reload
+npm run dist    # build an installer for your system into dist/
+```
+
+Architecture, code style and the security rules for contributors are in [AGENTS.md](AGENTS.md).
 
 ## License
 
@@ -69,4 +179,4 @@ See [AGENTS.md](AGENTS.md) for architecture and code rules.
 
 ---
 
-Built by [lgcq.group](https://lgcq.group).
+<p align="center">Built by <a href="https://lgcq.group">lgcq.group</a></p>
