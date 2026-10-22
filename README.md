@@ -63,6 +63,10 @@ Provider API keys are picked up from the `vastai` / `runpodctl` configs or the `
 
 See [AGENTS.md](AGENTS.md) for architecture and code rules.
 
+## License
+
+[MIT](LICENSE)
+
 ---
 
 Built by [lgcq.group](https://lgcq.group).
