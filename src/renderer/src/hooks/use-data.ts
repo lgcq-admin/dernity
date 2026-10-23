@@ -1,6 +1,7 @@
 // Renderer-side state that mirrors main: models (with health), generations, chats.
 import { useCallback, useEffect, useState } from "react";
 import type { ModelConfig, ModelEntry, ModelHealth } from "@shared/model";
+import type { BestiaryFile } from "@shared/bestiary";
 import type { ChatSummary, Generation } from "@shared/types";
 import { api } from "@/lib/api";
 
@@ -49,6 +50,16 @@ export function useGenerations() {
     setItems((list) => list.filter((g) => g.id !== id));
   }, []);
   return { items, remove };
+}
+
+export function useBestiary() {
+  const [files, setFiles] = useState<BestiaryFile[]>([]);
+  useEffect(() => {
+    void api.bestiary.list().then(setFiles);
+    return api.bestiary.onChanged(setFiles);
+  }, []);
+  const entries = files.flatMap((f) => (f.entry ? [f.entry] : []));
+  return { entries, invalid: files.filter((f) => !f.entry) };
 }
 
 export function useChats() {

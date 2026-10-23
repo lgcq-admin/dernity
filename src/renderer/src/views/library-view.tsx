@@ -8,7 +8,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { api } from "@/lib/api";
 
-export function LibraryView({ generations, onOpen }: { generations: Generation[]; onOpen: (g: Generation) => void }) {
+export function LibraryView({ generations, onOpen }: { generations: Generation[]; onOpen: (g: Generation, list: Generation[]) => void }) {
   const [query, setQuery] = useState("");
   const [model, setModel] = useState("all");
 
@@ -20,7 +20,7 @@ export function LibraryView({ generations, onOpen }: { generations: Generation[]
   return (
     <div className="flex h-full flex-col">
       <header className="flex items-center gap-2 border-b px-4 py-2">
-        <span className="text-sm font-medium">Library</span>
+        <span className="font-display text-xl leading-none font-light">Library</span>
         <span className="text-xs text-muted-foreground">{shown.length} items</span>
         <div className="flex-1" />
         <div className="relative w-64">
@@ -50,7 +50,7 @@ export function LibraryView({ generations, onOpen }: { generations: Generation[]
         ) : (
           <div className="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-3 p-4">
             {shown.map((g) => (
-              <GenerationCard key={g.id} g={g} onOpen={() => onOpen(g)} />
+              <GenerationCard key={g.id} g={g} onOpen={() => onOpen(g, shown)} />
             ))}
           </div>
         )}

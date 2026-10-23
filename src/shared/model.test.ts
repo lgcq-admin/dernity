@@ -6,7 +6,7 @@ import { defaultParamValues, parseModelFile } from "./model";
 describe("parseModelFile", () => {
   it("accepts every example shipped to the agent", () => {
     const dir = path.resolve("workspace/examples");
-    for (const file of fs.readdirSync(dir)) {
+    for (const file of fs.readdirSync(dir).filter((f) => f.endsWith(".json"))) {
       const entry = parseModelFile(file, fs.readFileSync(path.join(dir, file), "utf8"));
       expect(entry.error, file).toBeUndefined();
     }

@@ -7,6 +7,7 @@ import { resumeGenerations } from "./generations";
 import { closeTunnels } from "./hosts";
 import { registerIpc } from "./ipc";
 import { startMachineTracker } from "./machines";
+import { loadBestiary, watchBestiary } from "./bestiary";
 import { loadModels, watchModels } from "./models";
 import { killAllTerminals } from "./terminals";
 import { setupWorkspace } from "./workspace";
@@ -57,6 +58,8 @@ app.whenReady().then(async () => {
   setupWorkspace();
   loadModels();
   watchModels();
+  loadBestiary();
+  watchBestiary();
   handleFileScheme();
   registerIpc();
   resumeGenerations();

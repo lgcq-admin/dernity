@@ -26,7 +26,7 @@ export function FileSlot({ input, files, onChange }: Props) {
       <div className="flex items-baseline justify-between text-xs text-muted-foreground">
         <span>
           {input.label}
-          {input.required && <span className="text-red-400"> *</span>}
+          {input.required && <span className="text-red-400" aria-label="required"> *</span>}
         </span>
         {input.max > 1 && (
           <span>
@@ -37,7 +37,7 @@ export function FileSlot({ input, files, onChange }: Props) {
       <div
         className={cn(
           "flex min-h-20 flex-wrap gap-2 rounded-lg border border-dashed p-2 transition-colors",
-          dragging && "border-primary bg-accent/40",
+          dragging && "border-foreground/40 bg-accent",
         )}
         onDragOver={(e) => {
           e.preventDefault();

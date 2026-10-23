@@ -7,6 +7,7 @@ export const HOME = process.env.DERNITY_HOME ? path.resolve(process.env.DERNITY_
 export const WORKSPACE = path.join(HOME, "workspace"); // agent cwd
 export const MODELS = path.join(WORKSPACE, "models");
 export const WORKFLOWS = path.join(WORKSPACE, "workflows");
+export const BESTIARY = path.join(WORKSPACE, "bestiary"); // model guides the agent writes
 export const SECRETS = path.join(WORKSPACE, "secrets"); // server tokens the agent creates, one file each
 export const STATUS = path.join(WORKSPACE, ".dernity"); // app -> agent feedback: schema, validation, health
 export const LIBRARY = path.join(HOME, "library"); // private: never readable by the agent

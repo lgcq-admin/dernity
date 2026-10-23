@@ -1,4 +1,4 @@
-import { AlertTriangleIcon, ImageIcon, LibraryIcon, MessageSquareIcon, PlusIcon, ServerIcon, SettingsIcon, SquareTerminalIcon, Trash2Icon, VideoIcon } from "lucide-react";
+import { AlertTriangleIcon, BookOpenTextIcon, ImageIcon, LibraryIcon, MessageSquareIcon, PlusIcon, ServerIcon, SettingsIcon, SquareTerminalIcon, Trash2Icon, VideoIcon } from "lucide-react";
 import type { ModelConfig } from "@shared/model";
 import type { ChatSummary } from "@shared/types";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -14,7 +14,8 @@ export type View =
   | { type: "model"; id: string }
   | { type: "chat"; id: string }
   | { type: "library" }
-  | { type: "machines" };
+  | { type: "machines" }
+  | { type: "bestiary"; id?: string };
 
 const KIND_ICON = { chat: MessageSquareIcon, image: ImageIcon, video: VideoIcon };
 
@@ -42,6 +43,7 @@ export function AppSidebar({ view, setView, models, chats, onNewChat, onDeleteCh
       <nav className="grid gap-0.5 px-2">
         <NavItem icon={LibraryIcon} label="Library" active={view.type === "library"} onClick={() => setView({ type: "library" })} />
         <NavItem icon={ServerIcon} label="Machines" active={view.type === "machines"} onClick={() => setView({ type: "machines" })} />
+        <NavItem icon={BookOpenTextIcon} label="Bestiary" active={view.type === "bestiary"} onClick={() => setView({ type: "bestiary" })} />
       </nav>
 
       <ScrollArea className="mt-3 min-h-0 flex-1">

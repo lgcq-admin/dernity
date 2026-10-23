@@ -5,6 +5,7 @@ import { randomUUID } from "node:crypto";
 import * as pty from "node-pty";
 import type { DetectedCli } from "@shared/types";
 import { userShell } from "./env";
+import { terminalEnv } from "./secrets";
 import { shellQuote } from "./shell-quote";
 import { WORKSPACE } from "./paths";
 
@@ -53,7 +54,7 @@ export function createTerminal(
     cols: 100,
     rows: 30,
     cwd: WORKSPACE,
-    env: { ...process.env, TERM: "xterm-256color", COLORTERM: "truecolor" } as Record<string, string>,
+    env: { ...process.env, ...terminalEnv(), TERM: "xterm-256color", COLORTERM: "truecolor" } as Record<string, string>,
   });
   sessions.set(id, proc);
   proc.onData((d) => onData(id, d));

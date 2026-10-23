@@ -8,9 +8,11 @@ import { SettingsDialog } from "@/components/settings-dialog";
 import { type AgentRequest, TerminalDock } from "@/components/terminal-dock";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { findModel, useChats, useGenerations, useModels } from "@/hooks/use-data";
+import { guideFor } from "@shared/bestiary";
+import { findModel, useBestiary, useChats, useGenerations, useModels } from "@/hooks/use-data";
 import { api } from "@/lib/api";
 import { newId } from "@/lib/format";
+import { BestiaryView, type Preset } from "@/views/bestiary-view";
 import { ChatView } from "@/views/chat-view";
 import { HomeView } from "@/views/home-view";
 import { LibraryView } from "@/views/library-view";
@@ -20,6 +22,7 @@ import { StudioView } from "@/views/studio-view";
 export function App() {
   const models = useModels();
   const generations = useGenerations();
+  const bestiary = useBestiary();
   const { chats, refresh: refreshChats } = useChats();
   const [view, setView] = useState<View>({ type: "home" });
   const [terminalOpen, setTerminalOpen] = useState(false);
@@ -27,7 +30,9 @@ export function App() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [keysVersion, setKeysVersion] = useState(0);
   const [opened, setOpened] = useState<Generation | null>(null);
+  const [openedFrom, setOpenedFrom] = useState<string[]>([]);
   const [reuse, setReuse] = useState<Generation | null>(null);
+  const [preset, setPreset] = useState<(Preset & { n: number }) | null>(null);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -68,6 +73,11 @@ export function App() {
 
   // Keep the dialog in sync with live updates of the opened generation.
   const openedLive = opened ? (generations.items.find((g) => g.id === opened.id) ?? opened) : null;
+  const openedList = openedFrom.flatMap((id) => generations.items.find((g) => g.id === id) ?? []);
+  const open = (g: Generation, list: Generation[]) => {
+    setOpened(g);
+    setOpenedFrom(list.map((x) => x.id));
+  };
   const chatModelId = view.type === "chat" ? chats.find((c) => c.id === view.id)?.modelId : undefined;
 
   return (
@@ -86,8 +96,8 @@ export function App() {
         />
         <div className="flex min-w-0 flex-1 flex-col">
           <main className="min-h-0 flex-1">
-            {view.type === "home" && <HomeView invalid={models.invalid} onAskAgent={() => askAgent()} />}
-            {view.type === "library" && <LibraryView generations={generations.items} onOpen={setOpened} />}
+            {view.type === "home" && <HomeView invalid={models.invalid} onAskAgent={askAgent} />}
+            {view.type === "library" && <LibraryView generations={generations.items} onOpen={open} />}
             {view.type === "machines" && (
               <MachinesView models={models.models} onSettings={() => setSettingsOpen(true)} onRedeploy={askAgent} version={keysVersion} />
             )}
@@ -102,12 +112,29 @@ export function App() {
               />
             )}
             {view.type === "model" && renderStudio(view.id)}
+            {view.type === "bestiary" && (
+              <BestiaryView
+                entries={bestiary.entries}
+                invalid={bestiary.invalid}
+                models={models.models}
+                selected={view.id}
+                onSelect={(id) => setView({ type: "bestiary", id })}
+                onTry={(p) => {
+                  setPreset((old) => ({ ...p, n: (old?.n ?? 0) + 1 }));
+                  setView({ type: "model", id: p.modelId });
+                }}
+                onAskAgent={askAgent}
+              />
+            )}
           </main>
           <TerminalDock open={terminalOpen} onClose={() => setTerminalOpen(false)} agentRequest={agentRequest} />
         </div>
       </div>
       <GenerationDialog
         g={openedLive}
+        list={openedList}
+        model={openedLive ? findModel(models.models, openedLive.modelId) : undefined}
+        onNavigate={setOpened}
         onClose={() => setOpened(null)}
         onDelete={generations.remove}
         onReuse={(g) => {
@@ -125,7 +152,18 @@ export function App() {
     const model = findModel(models.models, id);
     if (!model) return <p className="p-8 text-sm text-muted-foreground">Model “{id}” is not configured anymore.</p>;
     return (
-      <StudioView key={id} model={model} health={models.health[id]} onCheck={() => void models.check(id)} generations={generations.items} reuse={reuse} onOpen={setOpened} />
+      <StudioView
+        key={id}
+        model={model}
+        health={models.health[id]}
+        onCheck={() => void models.check(id)}
+        generations={generations.items}
+        reuse={reuse}
+        preset={preset}
+        guide={guideFor(bestiary.entries, id)}
+        onOpenGuide={(gid) => setView({ type: "bestiary", id: gid })}
+        onOpen={open}
+      />
     );
   }
 }

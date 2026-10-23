@@ -2,6 +2,7 @@
 import { app, BrowserWindow, ipcMain, shell } from "electron";
 import { z } from "zod";
 import { ChatSchema, ChatStreamRequestSchema, GenerationRequestSchema, IncomingFileSchema } from "@shared/types";
+import { listBestiary, onBestiaryChanged } from "./bestiary";
 import { abortChat, attachFile, getChat, listChats, removeChat, saveChat, streamChat } from "./chats";
 import { generationDir, listGenerations, onGenerationUpdate, removeGeneration, submitGeneration } from "./generations";
 import { checkHealth, onHealth } from "./health";
@@ -12,7 +13,7 @@ import { keyStatus, setKey } from "./secrets";
 import { createTerminal, detectClis, killTerminal, resizeTerminal, writeTerminal } from "./terminals";
 
 const id = z.string().min(1).max(200);
-const provider = z.enum(["runpod", "vast"]);
+const secretName = z.enum(["runpod", "vast", "huggingface"]);
 
 function broadcast(channel: string, ...args: unknown[]): void {
   for (const win of BrowserWindow.getAllWindows()) win.webContents.send(channel, ...args);
@@ -45,6 +46,9 @@ export function registerIpc(): void {
   onHealth((mid, h) => broadcast("models:healthChanged", mid, h));
   onModelsChanged((entries) => broadcast("models:changed", entries));
 
+  handle("bestiary:list", [], () => listBestiary());
+  onBestiaryChanged((files) => broadcast("bestiary:changed", files));
+
   handle("chats:list", [], () => listChats());
   handle("chats:get", [id], (cid) => getChat(cid));
   handle("chats:save", [ChatSchema], (chat) => saveChat(chat));
@@ -64,7 +68,7 @@ export function registerIpc(): void {
   handle("machines:history", [], () => readHistory());
 
   handle("secrets:status", [], () => keyStatus());
-  handle("secrets:set", [provider, z.string().max(500).nullable()], (p, key) => setKey(p, key));
+  handle("secrets:set", [secretName, z.string().max(500).nullable()], (name, key) => setKey(name, key));
 
   handle("terminals:detect", [], () => detectClis());
   handle("terminals:create", [z.string().optional(), z.string().max(2000).optional()], (command, prompt) =>

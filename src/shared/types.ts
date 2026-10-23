@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { BestiaryFile } from "./bestiary";
 import type { Deployment, MachineRecord } from "./history";
 import type { ModelEntry, ModelHealth, ParamValues } from "./model";
 
@@ -127,6 +128,9 @@ export type ProviderState = {
 
 export type KeySource = "app" | "env" | "cli" | "none";
 
+// Keys the app stores: provider API keys, and the Hugging Face token the agent terminals get as HF_TOKEN.
+export type SecretName = Provider | "huggingface";
+
 export type DetectedCli = { command: string; name: string; path: string };
 
 export type AppInfo = {
@@ -150,6 +154,10 @@ export interface DernityApi {
     onChanged(cb: (models: ModelEntry[]) => void): () => void;
     onHealth(cb: (id: string, health: ModelHealth) => void): () => void;
   };
+  bestiary: {
+    list(): Promise<BestiaryFile[]>;
+    onChanged(cb: (files: BestiaryFile[]) => void): () => void;
+  };
   chats: {
     list(): Promise<ChatSummary[]>;
     get(id: string): Promise<Chat | null>;
@@ -171,8 +179,8 @@ export interface DernityApi {
     history(): Promise<{ machines: MachineRecord[]; deployments: Deployment[]; invalidDeployments: number }>;
   };
   secrets: {
-    status(): Promise<Record<Provider, KeySource>>;
-    set(provider: Provider, key: string | null): Promise<void>;
+    status(): Promise<Record<SecretName, KeySource>>;
+    set(name: SecretName, key: string | null): Promise<void>;
   };
   terminals: {
     detect(): Promise<DetectedCli[]>;

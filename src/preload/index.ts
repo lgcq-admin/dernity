@@ -23,6 +23,10 @@ const api: DernityApi = {
     onChanged: (cb) => on("models:changed", cb),
     onHealth: (cb) => on("models:healthChanged", cb),
   },
+  bestiary: {
+    list: () => invoke("bestiary:list"),
+    onChanged: (cb) => on("bestiary:changed", cb),
+  },
   chats: {
     list: () => invoke("chats:list"),
     get: (id) => invoke("chats:get", id),
@@ -45,7 +49,7 @@ const api: DernityApi = {
   },
   secrets: {
     status: () => invoke("secrets:status"),
-    set: (provider, key) => invoke("secrets:set", provider, key),
+    set: (name, key) => invoke("secrets:set", name, key),
   },
   terminals: {
     detect: () => invoke("terminals:detect"),

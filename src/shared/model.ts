@@ -44,15 +44,19 @@ export const ParamSchema = z.object({
   key: z.string().regex(/^[a-zA-Z][a-zA-Z0-9_]*$/),
   label: z.string(),
   type: z.enum(["select", "number", "text", "textarea", "boolean"]),
-  options: z.array(z.union([z.string(), z.number()])).optional().describe("Choices for type=select"),
+  options: z
+    .array(z.union([z.string(), z.number(), z.object({ value: z.union([z.string(), z.number()]), label: z.string().min(1) })]))
+    .optional()
+    .describe("Choices for type=select; use { value, label } when the value is long (file names, sampler ids)"),
   min: z.number().optional(),
   max: z.number().optional(),
-  step: z.number().optional(),
+  step: z.number().positive().optional(),
   default: z.union([z.string(), z.number(), z.boolean(), z.null()]).optional(),
   placeholder: z.string().optional(),
   suffix: z.string().optional(),
   hint: z.string().optional(),
-});
+  required: z.boolean().optional().describe("Generation can't run without a value; shown with an asterisk"),
+}).refine((p) => p.type !== "select" || (p.options?.length ?? 0) > 0, { message: "type=select needs options", path: ["options"] });
 
 export const FileInputSchema = z.object({
   key: z.string().regex(/^[a-zA-Z][a-zA-Z0-9_]*$/).describe("e.g. refs, first_frame, last_frame, images"),
@@ -81,6 +85,10 @@ export const ModelConfigSchema = z.object({
     .regex(/^[a-zA-Z0-9][a-zA-Z0-9._-]*$/, "a file name inside workspace/secrets/, no paths")
     .optional()
     .describe("File in workspace/secrets/ holding a Bearer token for the server"),
+  prompt: z
+    .enum(["required", "optional"])
+    .default("required")
+    .describe("Image/video: whether the model needs text. optional for models that work from input files alone"),
   inputs: z.array(FileInputSchema).default([]).describe("File inputs the model accepts; the UI shows only these"),
   params: z.array(ParamSchema).default([]).describe("Generation parameters shown as form fields"),
   options: z.record(z.string(), z.unknown()).default({}).describe("Protocol-specific settings"),

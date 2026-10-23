@@ -1,6 +1,7 @@
 // Image/video generations. Each one is a folder library/<date>/<id>/ with meta.json (prompt, params,
 // model, status), refs/ (input files) and the outputs. Main owns the job: it submits, polls and downloads,
 // so closing or reloading the window loses nothing, and unfinished jobs resume on the next start.
+import { missingRequired } from "@shared/params";
 import { randomBytes } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
@@ -59,10 +60,11 @@ export function generationDir(id: string): string {
 export function submitGeneration(req: GenerationRequest): Generation {
   const model = getModel(req.modelId);
   if (model.kind === "chat") throw new Error(`${model.name} is a chat model`);
+  const fileCounts = Object.fromEntries(Object.entries(req.files).map(([k, f]) => [k, f.length]));
+  const missing = missingRequired(model, { prompt: req.prompt, params: req.params, fileCounts });
+  if (missing.length) throw new Error(`Required: ${missing.join(", ")}`);
   for (const input of model.inputs) {
-    const count = req.files[input.key]?.length ?? 0;
-    if (input.required && count === 0) throw new Error(`${input.label} is required`);
-    if (count > input.max) throw new Error(`${input.label}: at most ${input.max}`);
+    if ((fileCounts[input.key] ?? 0) > input.max) throw new Error(`${input.label}: at most ${input.max}`);
   }
 
   const now = new Date();

@@ -3,21 +3,23 @@
 import fs from "node:fs";
 import path from "node:path";
 import { z } from "zod";
+import { BestiaryEntrySchema } from "@shared/bestiary";
 import { DeploymentSchema } from "@shared/history";
 import { ModelConfigSchema } from "@shared/model";
-import { CHAT_FILES, CHATS, LIBRARY, MODELS, SECRETS, STATUS, WORKFLOWS, WORKSPACE, templateDir } from "./paths";
+import { BESTIARY, CHAT_FILES, CHATS, LIBRARY, MODELS, SECRETS, STATUS, WORKFLOWS, WORKSPACE, templateDir } from "./paths";
 
 // Files from the template that belong to the user once copied; everything else is managed and refreshed.
 const USER_OWNED = new Set(["NOTES.md"]);
 
 export function setupWorkspace(): void {
-  for (const dir of [WORKSPACE, MODELS, WORKFLOWS, STATUS, LIBRARY, CHATS, CHAT_FILES]) {
+  for (const dir of [WORKSPACE, MODELS, WORKFLOWS, BESTIARY, STATUS, LIBRARY, CHATS, CHAT_FILES]) {
     fs.mkdirSync(dir, { recursive: true });
   }
   fs.mkdirSync(SECRETS, { recursive: true, mode: 0o700 });
   copyTemplate(templateDir(), WORKSPACE);
   writeJson(path.join(WORKSPACE, ".claude", "settings.json"), agentSettings());
   writeJson(path.join(STATUS, "model.schema.json"), z.toJSONSchema(ModelConfigSchema, { io: "input" }));
+  writeJson(path.join(STATUS, "bestiary.schema.json"), z.toJSONSchema(BestiaryEntrySchema, { io: "input" }));
   writeJson(path.join(STATUS, "deployment.schema.json"), z.toJSONSchema(DeploymentSchema, { io: "input" }));
 }
 
