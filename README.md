@@ -35,11 +35,18 @@ Dernity puts that in one place:
 - **One window for every model.** Text models get a chat. Image and video models get a generation studio.
 - **The UI fits the model.** If a video model takes a first and last frame, you get two frame slots. If an
   image model takes references, you can attach them. If it doesn't, the field isn't there.
+- **A guide to every model.** After a deploy the agent writes down what the model can do, its limits,
+  prompts that work and which GPUs it fit on. The Bestiary shows it as cards, and one click fills the
+  studio with an example or the recommended settings. The agent reads it again before the next deploy.
 - **Know what you're paying for.** Balances, running and stopped machines, $/h, and a history of what ran
   where, with a button to bring it back.
 
 <p align="center">
   <img src="docs/studio.png" alt="A video model that takes a first and last frame" width="880">
+</p>
+
+<p align="center">
+  <img src="docs/bestiary.png" alt="The Bestiary guide for a video model" width="880">
 </p>
 
 ## Getting started
@@ -73,6 +80,8 @@ You need an account with money on it at [Vast.ai](https://vast.ai) or [RunPod](h
 
 - **API key.** If you use the `vastai` or `runpodctl` CLI, Dernity reads the key from their config.
   Otherwise paste it in **Settings**; it's stored encrypted with your system keychain.
+- **Hugging Face token** (optional). Gated models need one. Paste it in **Settings** and agent terminals
+  get it as `HF_TOKEN`.
 - **SSH key.** Add your public SSH key to your Vast.ai or RunPod account. The agent sets model servers up
   behind an SSH tunnel or a token, so nobody else can use them.
 
