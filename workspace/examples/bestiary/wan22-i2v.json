@@ -1,0 +1,41 @@
+{
+  "id": "wan22-i2v",
+  "name": "Wan 2.2 image-to-video",
+  "kind": "video",
+  "summary": "Open 14B mixture-of-experts video model from Alibaba. Animates a still image into a short clip with strong motion and camera control.",
+  "repo": "Wan-AI/Wan2.2-I2V-A14B",
+  "models": ["wan22-i2v"],
+  "tasks": ["image-to-video", "camera motion"],
+  "limits": [
+    { "label": "Length", "value": "81 frames", "note": "5 s at 16 fps; longer clips loop or drift" },
+    { "label": "Frame rule", "value": "4n + 1" },
+    { "label": "Resolution", "value": "480p, 720p", "note": "Sides divisible by 16" }
+  ],
+  "settings": [
+    { "key": "shortEdge", "label": "Short edge", "value": 480, "why": "720p is much slower; start at 480p and go up for finals" },
+    { "key": "seconds", "label": "Duration", "value": 5, "why": "The length it was trained on" }
+  ],
+  "prompting": {
+    "tips": [
+      "Describe the motion and the camera, not what's already in the image.",
+      "One clear action per clip works better than a sequence of events."
+    ],
+    "avoid": ["Text and logos that must stay legible across frames."],
+    "examples": [
+      {
+        "title": "Slow push-in",
+        "prompt": "The camera slowly pushes in while the subject turns their head toward the light, soft wind in the hair, natural motion",
+        "params": { "seconds": 5 }
+      }
+    ]
+  },
+  "hardware": [
+    { "gpu": "RTX 4090", "vramGb": 24, "fits": true, "note": "With fp8 weights and model offloading" }
+  ],
+  "gotchas": ["The workflow needs both high-noise and low-noise expert weights; downloading one gives a black video."],
+  "sources": [
+    { "label": "Model card", "url": "https://huggingface.co/Wan-AI/Wan2.2-I2V-A14B" },
+    { "label": "Wan 2.2 repo", "url": "https://github.com/Wan-Video/Wan2.2" }
+  ],
+  "updatedAt": "2026-10-23"
+}

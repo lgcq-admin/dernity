@@ -14,6 +14,7 @@ in `NOTES.md`; read it first.
 workspace/                 your working directory
   models/<id>.json         model configs: you write these, the app reads them live
   workflows/<name>.json    ComfyUI workflows (API format) referenced by configs
+  bestiary/<id>.json       model guides you write; the app shows them in its Bestiary
   examples/                example configs to copy from
   scripts/                 helpers: gpu-offers.mjs, hf-model.mjs
   secrets/<id>.token       server tokens you generate (referenced by apiKeyFile); never print them
@@ -21,6 +22,8 @@ workspace/                 your working directory
   .dernity/                written by the app for you:
     model.schema.json        JSON Schema of a model config
     models-status.json       per config: valid or the validation error, and whether the server answers
+    bestiary.schema.json     JSON Schema of a bestiary guide
+    bestiary-status.json     per guide: valid or the validation error
     deployment.schema.json   JSON Schema of a deployments.jsonl line
     machines.json            every machine the app has seen: GPU, region, image, when it ran, $/h
   NOTES.md                 the user's preferences (budget, regions, SSH keys…)
@@ -62,7 +65,9 @@ These come from real mistakes. Follow them even when a shortcut looks harmless.
 - Server tokens: generate a random one (`openssl rand -hex 24`), write it to `secrets/<id>.token`
   (`chmod 600`), pass it to the server, and set `"apiKeyFile": "<id>.token"` in the config.
   `apiKeyEnv` with a `DERNITY_*` variable also works when the user already keeps the token in their shell.
-- `HF_TOKEN` goes to the machine as an environment variable, never in command arguments.
+- `HF_TOKEN`: if the user saved a Hugging Face token in Dernity, it's already in your environment as
+  `$HF_TOKEN`. Use it for gated repos (`hf-model.mjs` picks it up) and pass it to machines as an
+  environment variable, never in command arguments. Never print it.
 - `runpodctl pod get` output can contain env vars with tokens: read single fields only.
 
 ### History
@@ -90,6 +95,7 @@ These come from real mistakes. Follow them even when a shortcut looks harmless.
 | connect a model that's already running | follow `.claude/skills/connect-model/SKILL.md` |
 | run again something from before ("the Qwen I ran yesterday") | follow `.claude/skills/redeploy/SKILL.md` |
 | what can model X do, add refs / first-last frame / params | follow `.claude/skills/model-capabilities/SKILL.md` |
+| write / update a model guide, "add it to the bestiary" | follow `.claude/skills/bestiary/SKILL.md` |
 | how much am I spending, what's running | `vastai show instances`, `runpodctl pod list`; the app's Machines view shows it too |
 
 The skills are plain Markdown; agents without a skills feature should just read and follow them.
@@ -104,6 +110,7 @@ Full schema: `.dernity/model.schema.json`. Examples: `examples/`.
   "name": "Qwen3 32B",               // shown in the app
   "kind": "chat",                    // chat | image | video
   "protocol": "openai-chat",         // openai-chat | comfyui
+  "prompt": "required",              // image/video: "optional" when the model works without text (e.g. i2v)
   "host": { "type": "vast", "label": "qwen3-32b", "port": 8000 },
   "inputs": [],                      // file inputs the model accepts; the UI shows only these
   "params": [],                      // form fields; for openai-chat the key is the API field name
@@ -127,13 +134,19 @@ Inputs: `{ "key": "first_frame", "label": "First frame", "accept": "image", "max
 Conventional keys: `refs` (reference images), `first_frame`, `last_frame`, `images` (vision input for chat),
 `video`, `audio`. For ComfyUI the key is used in the workflow as `{{file:<key>}}`.
 
-Params: `{ "key": "steps", "label": "Steps", "type": "number", "min": 1, "max": 50, "default": 8 }`.
+Params: `{ "key": "steps", "label": "Steps", "type": "number", "min": 1, "max": 50, "step": 1, "default": 8 }`.
+`"required": true` marks a param the model can't run without (shown with an asterisk, Generate stays off
+until it's set). Mark inputs and the prompt required or optional honestly: the user relies on the asterisks.
 Types: select (with `options`), number, text, textarea, boolean. `default: null` means "auto" (a null seed is
-randomized).
+randomized). Numbers with `min` and `max` become sliders; give select options with long values a short
+label: `{ "value": "<long value>", "label": "Short" }`. Only offer ranges you checked on the running server
+(see the model-capabilities skill).
 
 ## After writing a config
 
 1. Wait a few seconds, then read `.dernity/models-status.json`.
 2. Not valid: fix what the error says. Valid but not healthy: check the machine is running, the port, and
    the server logs (`ssh` in, or `vastai logs <id>`).
-3. Tell the user the model is in the sidebar and what it supports.
+3. Run one light smoke test (model-capabilities skill, step 3). Never long or large test generations.
+4. Write or update its guide in `bestiary/` (bestiary skill).
+5. Tell the user the model is in the sidebar, what it supports, and what you tested.

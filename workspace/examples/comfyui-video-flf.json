@@ -11,9 +11,9 @@
   "params": [
     { "key": "aspect", "label": "Aspect", "type": "select", "options": ["16:9", "9:16", "1:1"], "default": "16:9" },
     { "key": "shortEdge", "label": "Short edge", "type": "select", "options": [480, 720], "default": 480, "suffix": "px" },
-    { "key": "seconds", "label": "Duration", "type": "number", "min": 1, "max": 5, "step": 1, "default": 5, "suffix": "s" },
+    { "key": "seconds", "label": "Duration", "type": "number", "min": 1, "max": 5, "step": 1, "default": 5, "suffix": "s", "hint": "Wan is trained on up to 81 frames (5 s at 16 fps)" },
     { "key": "seed", "label": "Seed", "type": "number", "min": 0, "step": 1, "default": null, "placeholder": "random" }
   ],
-  "options": { "workflow": "wan22-flf2v.json", "fps": 16, "frameStep": 4 },
+  "options": { "workflow": "wan22-flf2v.json", "fps": 16, "frameStep": 4, "sizeStep": 16 },
   "notes": "Describe the motion between the two frames, not the frames themselves."
 }

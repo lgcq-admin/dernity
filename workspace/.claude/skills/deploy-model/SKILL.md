@@ -10,6 +10,8 @@ Read `NOTES.md` first for the user's budget, preferred providers, regions and SS
 
 ## 1. Understand the model
 
+- Check `bestiary/` first: if there's a guide for this model or a close relative, use its limits, settings,
+  hardware rows and gotchas instead of rediscovering them.
 - Find the exact repository: `node scripts/hf-model.mjs <owner/repo>`. It prints the task, license, gated
   status, weight size, GGUF files and a VRAM estimate. If the user gave a loose name, search Hugging Face
   and confirm the repo with the user when there's more than one plausible match.
@@ -94,9 +96,15 @@ Append one line to `deployments.jsonl` right after the machine is created (schem
 ## 7. Connect it
 
 Write `models/<id>.json` (see the connect-model skill and `examples/`), with the inputs, params and notes you
-learned in step 1. Then check `.dernity/models-status.json` until the model is valid and healthy.
+learned in step 1. Then check `.dernity/models-status.json` until the model is valid and healthy, and run
+the server checks and the one light smoke test from the model-capabilities skill (steps 2 and 3).
 
-## 8. Report
+## 8. Write the guide
+
+Create or update `bestiary/<id>.json` (bestiary skill) with what you learned: limits, recommended
+settings, example prompts, the GPU it ran on with $/h, and anything that went wrong.
+
+## 9. Report
 
 Tell the user: what runs where, $/h, what the model supports in the app, and how to stop it
 (`vastai stop instance <id>` / `runpodctl pod stop <id>`) so they don't pay for idle time.
