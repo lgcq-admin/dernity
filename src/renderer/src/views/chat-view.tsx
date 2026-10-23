@@ -102,7 +102,7 @@ export function ChatView({ chatId, model, health, onCheck, onSaved }: Props) {
     <div className="flex h-full flex-col">
       <header className="flex items-center gap-2 border-b px-4 py-2">
         <StatusDot health={health} onCheck={onCheck} />
-        <span className="text-sm font-medium">{model.name}</span>
+        <span className="font-display text-xl leading-none font-light">{model.name}</span>
         <span className="truncate text-xs text-muted-foreground">{statusText(health)}</span>
         <div className="flex-1" />
         <ChatSettings model={model} chat={chat} params={params} setParams={setParams} onSystem={(system) => setChat({ ...chat, system })} />
@@ -110,7 +110,12 @@ export function ChatView({ chatId, model, health, onCheck, onSaved }: Props) {
 
       <Conversation className="min-h-0 flex-1">
         <ConversationContent className="mx-auto w-full max-w-3xl">
-          {chat.messages.length === 0 && <ConversationEmptyState title={model.name} description={model.notes ?? "Send a message to start"} />}
+          {chat.messages.length === 0 && (
+            <ConversationEmptyState className="min-h-[60vh]">
+              <span className="font-display text-5xl leading-none font-light">{model.name}</span>
+              <p className="max-w-md text-sm whitespace-pre-wrap text-muted-foreground">{model.notes ?? "Send a message to start"}</p>
+            </ConversationEmptyState>
+          )}
           {chat.messages.map((m) => (
             <Message key={m.id} from={m.role}>
               <MessageContent>

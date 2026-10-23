@@ -41,7 +41,7 @@ export function MachinesView({ models, onSettings, onRedeploy, version }: Props)
   return (
     <div className="flex h-full flex-col">
       <header className="flex items-center gap-3 border-b px-4 py-2">
-        <span className="text-sm font-medium">Machines</span>
+        <span className="font-display text-xl leading-none font-light">Machines</span>
         <Tabs value={tab} onValueChange={setTab}>
           <TabsList className="h-7">
             <TabsTrigger value="now" className="text-xs">

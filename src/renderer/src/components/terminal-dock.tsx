@@ -2,7 +2,7 @@
 import { FitAddon } from "@xterm/addon-fit";
 import { WebLinksAddon } from "@xterm/addon-web-links";
 import { Terminal } from "@xterm/xterm";
-import { PlusIcon, SquareTerminalIcon, XIcon } from "lucide-react";
+import { PlusIcon, XIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { DetectedCli } from "@shared/types";
 import { Button } from "@/components/ui/button";
@@ -81,7 +81,7 @@ export function TerminalDock({ open, onClose, agentRequest }: { open: boolean; o
 
   return (
     <div className={cn("flex shrink-0 flex-col border-t bg-background", !open && "hidden")} style={{ height }}>
-      <div className="h-1 cursor-row-resize hover:bg-primary/30" onPointerDown={onDrag} />
+      <div className="h-1 cursor-row-resize hover:bg-foreground/20" onPointerDown={onDrag} />
       <div className="flex items-center gap-1 border-b px-2 pb-1">
         {tabs.map((t) => (
           <div
@@ -107,9 +107,7 @@ export function TerminalDock({ open, onClose, agentRequest }: { open: boolean; o
       </div>
       <div className="relative min-h-0 flex-1">
         {tabs.length === 0 && (
-          <div className="flex h-full flex-col items-center justify-center gap-3 text-sm text-muted-foreground">
-            <SquareTerminalIcon className="size-6" />
-            <p>Start your agent in the Dernity workspace. It already knows how to deploy and connect models.</p>
+          <div className="flex h-full items-center justify-center">
             <div className="flex flex-wrap justify-center gap-2">
               {clis.map((c) => (
                 <Button key={c.command} variant="outline" size="sm" onClick={() => void start(c.command)}>
@@ -164,7 +162,7 @@ function TerminalView({ id, visible }: { id: string; visible: boolean }) {
       fontSize: 13,
       cursorBlink: true,
       allowProposedApi: true,
-      theme: { background: "#060806", foreground: "#edf2e4", cursor: "#76b900", selectionBackground: "#263a00" },
+      theme: { background: "#070707", foreground: "#ededed", cursor: "#76b900", selectionBackground: "rgba(255, 255, 255, 0.22)" },
     });
     const fitAddon = new FitAddon();
     term.loadAddon(fitAddon);

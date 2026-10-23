@@ -91,40 +91,41 @@
     --sidebar-ring: oklch(0.708 0 0);
 }
 
-/* Dark theme in the website's colours: near-black ground, volt (#76B900) as the one accent, the site's
-   ink and muted for text. Surfaces stay neutral grey; green is only for the accent. */
+/* Dark theme: neutral near-black surfaces and neutral text for reading comfort; volt (#76B900) from the
+   website is the one accent, kept for primary actions, status and progress. No tinted greys: green-tinted
+   surfaces and text read as murky on screen. */
 .dark {
-    --background: #060806;
-    --foreground: #edf2e4;
-    --card: #111111;
-    --card-foreground: #edf2e4;
+    --background: #070707;
+    --foreground: #ededed;
+    --card: #0f0f0f;
+    --card-foreground: #ededed;
     --popover: #111111;
-    --popover-foreground: #edf2e4;
+    --popover-foreground: #ededed;
     --primary: #76b900;
     --primary-foreground: #0a0f04;
     --secondary: #1a1a1a;
-    --secondary-foreground: #edf2e4;
-    --muted: #1a1a1a;
-    --muted-foreground: #aeb8a3;
+    --secondary-foreground: #ededed;
+    --muted: #171717;
+    --muted-foreground: #a3a3a3;
     --accent: #1f1f1f;
-    --accent-foreground: #edf2e4;
+    --accent-foreground: #ededed;
     --destructive: oklch(0.704 0.191 22.216);
-    --border: rgb(237 242 228 / 10%);
-    --input: rgb(237 242 228 / 14%);
-    --ring: #5f9400;
+    --border: rgb(255 255 255 / 9%);
+    --input: rgb(255 255 255 / 12%);
+    --ring: rgb(255 255 255 / 40%);
     --chart-1: #76b900;
     --chart-2: #6aa600;
     --chart-3: #4d7a00;
     --chart-4: #335200;
     --chart-5: #1f3300;
-    --sidebar: #0c0c0c;
-    --sidebar-foreground: #edf2e4;
+    --sidebar: #0b0b0b;
+    --sidebar-foreground: #ededed;
     --sidebar-primary: #76b900;
     --sidebar-primary-foreground: #0a0f04;
-    --sidebar-accent: #1f1f1f;
-    --sidebar-accent-foreground: #edf2e4;
-    --sidebar-border: rgb(237 242 228 / 10%);
-    --sidebar-ring: #5f9400;
+    --sidebar-accent: #1c1c1c;
+    --sidebar-accent-foreground: #ededed;
+    --sidebar-border: rgb(255 255 255 / 9%);
+    --sidebar-ring: rgb(255 255 255 / 40%);
 }
 
 @layer base {
@@ -139,6 +140,9 @@
     }
   html {
     @apply font-sans;
+    }
+  ::selection {
+    background: rgb(255 255 255 / 22%);
     }
 }
 :root {

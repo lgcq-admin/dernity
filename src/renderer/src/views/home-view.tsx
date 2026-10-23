@@ -11,7 +11,7 @@ const EXAMPLES = [
   "What can the model wan-i2v do? Update its config",
 ];
 
-export function HomeView({ invalid, onAskAgent }: { invalid: ModelEntry[]; onAskAgent: () => void }) {
+export function HomeView({ invalid, onAskAgent }: { invalid: ModelEntry[]; onAskAgent: (prompt?: string) => void }) {
   return (
     <div className="mx-auto flex h-full max-w-2xl flex-col justify-center gap-6 p-8">
       <div className="grid gap-2">
@@ -24,13 +24,19 @@ export function HomeView({ invalid, onAskAgent }: { invalid: ModelEntry[]; onAsk
       </div>
       <div className="grid gap-2">
         {EXAMPLES.map((e) => (
-          <div key={e} className="rounded-md border px-3 py-2 text-sm text-muted-foreground">
+          <button
+            key={e}
+            type="button"
+            onClick={() => onAskAgent(e)}
+            className="group flex items-center gap-2 rounded-md border px-3 py-2 text-left text-sm text-muted-foreground transition-colors hover:border-foreground/20 hover:bg-accent hover:text-foreground"
+          >
             “{e}”
-          </div>
+            <SquareTerminalIcon className="ml-auto size-3.5 shrink-0 opacity-0 transition-opacity group-hover:opacity-100" />
+          </button>
         ))}
       </div>
       <div className="flex gap-2">
-        <Button onClick={onAskAgent}>
+        <Button onClick={() => onAskAgent()}>
           <SquareTerminalIcon /> Open agent terminal
         </Button>
         <Button variant="outline" onClick={() => void api.app.openPath("workspace")}>
