@@ -172,12 +172,38 @@ function TerminalView({ id, visible }: { id: string; visible: boolean }) {
     term.write(buffers.get(id) ?? "");
     sinks.set(id, (d) => term.write(d));
     const input = term.onData((d) => api.terminals.write(id, d));
+    const copy = () => {
+      void navigator.clipboard.writeText(term.getSelection());
+      term.clearSelection();
+    };
+    const paste = () => void navigator.clipboard.readText().then((text) => term.paste(text));
+    // Ctrl+C stays an interrupt, so copy and paste live on Ctrl+Shift like in other Linux terminals.
+    term.attachCustomKeyEventHandler((e) => {
+      if (!e.ctrlKey || !e.shiftKey || e.altKey || e.metaKey) return true;
+      // Physical key, so it works with any keyboard layout (e.key is "С" on a Russian one).
+      if (e.code !== "KeyC" && e.code !== "KeyV") return true;
+      // Without this Chromium also fires its own paste and the text lands twice.
+      e.preventDefault();
+      if (e.type === "keydown") {
+        if (e.code === "KeyV") paste();
+        else if (term.hasSelection()) copy();
+      }
+      return false;
+    });
+    const onContextMenu = (e: MouseEvent) => {
+      e.preventDefault();
+      if (term.hasSelection()) copy();
+      else paste();
+    };
+    el.current!.addEventListener("contextmenu", onContextMenu);
     const resize = term.onResize(({ cols, rows }) => api.terminals.resize(id, cols, rows));
     const observer = new ResizeObserver(() => {
       if (el.current?.offsetParent) fitAddon.fit();
     });
     observer.observe(el.current!);
+    const node = el.current!;
     return () => {
+      node.removeEventListener("contextmenu", onContextMenu);
       observer.disconnect();
       input.dispose();
       resize.dispose();
